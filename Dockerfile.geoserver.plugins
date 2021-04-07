@@ -1,0 +1,41 @@
+# vim:set ft=dockerfile:
+# ? have gosu, libnss-wrapper, procps
+FROM cprm.nds:geoserver.refer
+# FROM debian:buster-slim
+ENV LANG C.UTF8
+
+# sane 1
+RUN set -eux; \
+    apt update; \
+	apt upgrade -y ; \
+	apt install -y wget unzip zip
+
+# simplify and install default plugins
+
+COPY ./plugins /tmp
+
+WORKDIR /tmp
+
+# install minimal plugins
+# run do_plugins_list_all for complet list
+RUN set -eux; \
+	sh ./do_plugins_install.sh geoserver.plugins.minimal ; \
+	sh ./do_locales_pt_BR_clean.sh > /dev/null 
+
+# clean 
+RUN set -eux; \
+    apt autoremove -y ; \
+    apt clean -y ; \
+    rm -rf /var/lib/apt/lists/*
+
+#defaults
+
+WORKDIR /
+
+RUN mkdir -p /docker-entrypoint.d
+
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+
