@@ -2,45 +2,43 @@
 # Set variables to pass
 #
 
-name_it = "geoserver.plugins"
+name_it = geoserver.plugins
 
-ports = 8080:8088
+ports = -p 8087:8080
 
-uuid_it = $(shell uuid | sed -e 's/-//;' | cut -b 1-12 )
-
-image_tag = cprm.nds:$(name_it).refer
+image_tag = cprm.nds:$(name_it)2refer
 
 docker_file = Dockerfile.$(name_it)
 
 docker_env = $(name_it).env
 
-docker_name = $(name_it).$(uuid_it)
+container_name = $(name_it)4refer
 
 #
 # make what to make
 #
 
-auto-up: build up 
+auto-up: up 
 
-up:
+up: 
 
-	docker run -rm -d $(image_tag) --name $(docker_name) -p $(ports) --env-file $(docker_env) bash 
+	docker run --init --detach --name $(container_name) --env-file $(docker_env) $(ports) $(image_tag) $(use) 
 
-start:
+start: 
 	
-	docker container start $(docker_name)
+	docker container start $(container_name)
 
-stop:
+stop: 
 	
-	docker container stop $(docker_name)
+	docker container stop $(container_name)
 
-clean:
+clean: stop
 
-	docker container rm $(docker_name) 
+	docker container rm $(container_name) 
 
 build:
 
-	docker build -t $(image_tag) -f $(docker_file) . 
+	docker build --rm -t $(image_tag) -f $(docker_file) .
 
 razed:
 
@@ -52,9 +50,10 @@ wait:
 
 logs:
 
-	docker logs $(docker_name)
+	docker logs $(container_name)
 
 #smoketest: up
+#
 #	docker-compose exec --noinput --nocapture --detailed-errors --verbosity=1 --failfast
 #
 #unittest: up

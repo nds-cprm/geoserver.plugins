@@ -1,6 +1,6 @@
 # vim:set ft=dockerfile:
 # ? have gosu, libnss-wrapper, procps
-FROM cprm.nds:geoserver.refer
+FROM cprm.nds:geoserver2refer
 # FROM debian:buster-slim
 ENV LANG C.UTF8
 
